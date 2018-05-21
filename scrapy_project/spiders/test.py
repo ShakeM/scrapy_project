@@ -1,35 +1,19 @@
-import json
-from collections import Counter
+# 8N8NIN0NsN0N0NoNoNINyNoNoNhN-NIN-NINONhNhN8N-Ns
+# k8.y-Oh0N2IZsog.5-07861,+4%329
+def decipher(ciphertext, password):
+    length = int(len(password)/2)
 
-# with open('stock_list.json', 'rb') as f:
-#     all_zips = []
-#     for line in f.readlines():
-#         line = json.loads(line.decode('utf-8'))
-#         zips = line['zips']
-#         all_zips += zips
-#
-#
-#         # b = map(lambda x: push(x),[a for a in zips])
-#
-# symbols = list(map(lambda x:x['symbol'], all_zips))
-#
-# print(len(symbols))
-#
-# count = Counter(symbols)
-# print(count)
+    psw_dict = {}
+    for i in range(length):
+        psw_dict[password[i]] = password[length + i]
 
-# import os
-#
-# this_folder_path = os.path.dirname(__file__)
-# parent_folder_path = os.path.dirname(this_folder_path)
-# output_path = os.path.join(parent_folder_path, 'output')
-#
-# print(os.path.exists(output_path))
-#
-# if not os.path.exists(output_path):
-#     os.mkdir(output_path)
+    text_list = list(ciphertext)
+    result = []
+    for text in text_list:
+        text and result.append(psw_dict[text])
 
 
-import arrow
+    result_str = "".join(result)
+    return result_str
 
-print(arrow.now().format('YYYY-MM-DD_HH-mm-ss_X'))
+# decipher('8N8NIN0NsN0N0NoNoNINyNoNoNhN-NIN-NINONhNhN8N-Ns', 'k8.y-Oh0N2IZsog.5-07861,+4%329')

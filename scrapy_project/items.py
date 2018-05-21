@@ -18,3 +18,11 @@ class StockItem(scrapy.Item):
     code = scrapy.Field()
     name = scrapy.Field()
     extra = scrapy.Field()
+
+
+class IndexItem(scrapy.Item):
+    symbol = scrapy.Field()
+    pc = scrapy.Field()
+    mobile = scrapy.Field()
+    total = scrapy.Field()
+    password = scrapy.Field()
