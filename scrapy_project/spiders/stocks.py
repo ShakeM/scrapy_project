@@ -7,6 +7,11 @@ from ..items import StockItem
 class ShSpider(scrapy.Spider):
     name = 'sh_spider'
     allowed_domains = ['sse.com.cn']
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            'scrapy_project.pipelines.StockPipeline': 300,
+        }
+    }
     start_urls = [
         'http://yunhq.sse.com.cn:32041/v1/sh1/list/exchange/equity?select=code,name,open,high,low,last,prev_close,chg_rate,volume,amount,tradephase,change,amp_rate&order=&begin=1&end=9999']
 
@@ -25,8 +30,13 @@ class ShSpider(scrapy.Spider):
 class SzSpider(scrapy.Spider):
     name = 'sz_spider'
     allowed_domains = ['szse.cn']
-    start_urls = ['http://www.szse.cn/szseWeb/FrontController.szse']
+    custom_settings = {
+        "ITEM_PIPELINES": {
+            'scrapy_project.pipelines.StockPipeline': 300,
+        }
+    }
 
+    start_urls = ['http://www.szse.cn/szseWeb/FrontController.szse']
     index = 1
     formdata = {
         'ACTIONID': '7',

@@ -8,21 +8,20 @@
 from scrapy import signals
 
 
+class BaiduDownloaderMiddleware(object):
+    cookie = [
+        ''
+    ]
 
+    def process_request(self, request, spider):
+        print('PROCESSING REQUEST!')
+        request.headers['cookie'] = self.cookie
 
-# class SetXueqiuHeader(object):
-#     cookie = {'xq_a_token':'7023b46a2c20d7b0530b4e9725f7f869c8d16e7d'}
-#
-#     def process_request(self, request, spider):
-#         print('PROCESSING REQUEST!')
-#         request.headers['cookie'] = self.cookie
-#
-#         request.cookies = self.cookie
-#         request.headers['User-Agent'] = '123321'
-#         print(request.headers)
-#         print(request.headers['cookie'])
-        # return
-
+        request.cookies = self.cookie
+        request.headers['User-Agent'] = '123321'
+        print(request.headers)
+        print(request.headers['cookie'])
+        return
 
 # class ScrapyProjectSpiderMiddleware(object):
 #     # Not all methods need to be defined. If a method is not defined,
@@ -117,6 +116,3 @@ from scrapy import signals
 #
 #     def spider_opened(self, spider):
 #         spider.logger.info('Spider opened: %s' % spider.name)
-
-
-

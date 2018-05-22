@@ -1,19 +1,18 @@
-# 8N8NIN0NsN0N0NoNoNINyNoNoNhN-NIN-NINONhNhN8N-Ns
-# k8.y-Oh0N2IZsog.5-07861,+4%329
-def decipher(ciphertext, password):
-    length = int(len(password)/2)
-
-    psw_dict = {}
-    for i in range(length):
-        psw_dict[password[i]] = password[length + i]
-
-    text_list = list(ciphertext)
-    result = []
-    for text in text_list:
-        text and result.append(psw_dict[text])
+# http://index.baidu.com/Interface/Newwordgraph/getLive?wordlist[0]=%
 
 
-    result_str = "".join(result)
-    return result_str
+from string import Template
 
-# decipher('8N8NIN0NsN0N0NoNoNINyNoNoNhN-NIN-NINONhNhN8N-Ns', 'k8.y-Oh0N2IZsog.5-07861,+4%329')
+
+def join_live_url(words):
+    # 全国 北京 上海 广州 深圳
+    url = 'http://index.baidu.com/Interface/Newwordgraph/getLive?'
+
+    for w in words:
+        url += 'wordlist[]=' + str(w) + '&'
+
+    return url
+
+
+
+print(join_live_url(['a','b','c','d','e']))

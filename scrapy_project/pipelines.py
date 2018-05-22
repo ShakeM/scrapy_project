@@ -24,7 +24,6 @@ class StockPipeline(object):
         self.symbol_prefix = ''
         self.output_path = ''
         self.full_time = arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
-        self.go_ahead = True
 
     def open_spider(self, spider):
         # Make output folder
@@ -41,17 +40,12 @@ class StockPipeline(object):
         elif spider.__class__ == ShSpider:
             self.symbol_prefix = 'SH'
             file_name = 'sh_stock_%s.json' % self.full_time
-        else:
-            self.go_ahead = False
-            return
 
         self.fp = open(os.path.join(self.output_path, file_name), 'wb')
         self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
         print('Crawl Start...' + str(spider.__class__))
 
     def process_item(self, item, spider):
-        if not self.go_ahead:
-            return
 
         item['name'] = item['name'].replace('Ａ', 'A').replace('Ｂ', 'B').replace(' ', '')
         item['name'] = item['name'].replace('XD', '').replace('XR', '').replace('DR', '')
@@ -72,24 +66,29 @@ class StockPipeline(object):
         self.exporter.export_item(item)
 
     def close_spider(self, spider):
-        if not self.go_ahead:
-            return
         print('Crawl Stop...' + str(spider.__class__))
 
 
-class BaiduIndexPipeline(object):
+class IndexPipeline(object):
     def __init__(self):
         self.fp = {}
         self.exporter = {}
+        self.output_path = ''
         self.full_time = arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
 
     def open_spider(self, spider):
-        self.fp = open(os.path.join(self.output_path, 'index'), 'wb')
+        # Make output folder
+        this_folder_path = os.path.dirname(__file__)
+        self.output_path = os.path.join(this_folder_path, 'output')
+
+        if not os.path.exists(self.output_path):
+            os.mkdir(self.output_path)
+
+        # Save
+        self.fp = open(os.path.join(self.output_path, 'index.json'), 'wb')
         self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
-        pass
+        print('Crawl Start...' + str(spider.__class__))
 
     def process_item(self, item, spider):
+        print(item)
         self.exporter.export_item(item)
-        pass
-
-

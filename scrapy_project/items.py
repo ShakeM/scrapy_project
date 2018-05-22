@@ -21,8 +21,8 @@ class StockItem(scrapy.Item):
 
 
 class IndexItem(scrapy.Item):
-    symbol = scrapy.Field()
+    word = scrapy.Field()
+    period = scrapy.Field()
     pc = scrapy.Field()
-    mobile = scrapy.Field()
-    total = scrapy.Field()
-    password = scrapy.Field()
+    wise = scrapy.Field()
+    all = scrapy.Field()
