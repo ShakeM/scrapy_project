@@ -11,6 +11,8 @@ from scrapy import signals
 class BaiduDownloaderMiddleware(object):
     cookies = [
         {
+            "BDUSS": "1hMlV6ZVl4WnBqd0x5bmF-TWVac1RmRjU3NGFrb1BINVF3RkV0UUlNTi1TfnRaTVFBQUFBJCQAAAAAAAAAAAEAAAA8cC7Gua3B6cvJtcS5ysrCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6-01l-vtNZZU;"},
+        {
             "BDUSS": "0hUWU5oSlVub2RKNjBpSHNESGZoZk9rQVhJLS1SU1JkTFJnbGRVY29sYW1TfnRaSVFBQUFBJCQAAAAAAAAAAAEAAACARy7G1bKzve-~AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKa-01mmvtNZZ;"},
         {
             "BDUSS": "JjVjNhNktOblpLeThqblppT1Q2UTZFc35uY3NTbXpreDJ6Sk42M3NvR2hTfnRaTVFBQUFBJCQAAAAAAAAAAAEAAADXNi7Gy6vX09H0vrC4owAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKG-01mhvtNZb3;"},
@@ -26,19 +28,24 @@ class BaiduDownloaderMiddleware(object):
             "BDUSS": "0JpVThpZFJUWVNpeU0tUUpxZDFhcm5RU3YzWlVOMDQwMFBYZ2hPQ2VTdC1TfnRaTVFBQUFBJCQAAAAAAAAAAAEAAABvRi7GtKbFrtf5venH2dTPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6-01l-vtNZR;"},
         {
             "BDUSS": "k9HRlF4WWNoREkxdXBsUkpIc3g0NnVCQzI4TkdaNlo4MnRVLUcwZHNHbDZTfnRaTVFBQUFBJCQAAAAAAAAAAAEAAABURi7GxeHStryqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHq-01l6vtNZf;"},
-        {
-            "BDUSS": "1hMlV6ZVl4WnBqd0x5bmF-TWVac1RmRjU3NGFrb1BINVF3RkV0UUlNTi1TfnRaTVFBQUFBJCQAAAAAAAAAAAEAAAA8cC7Gua3B6cvJtcS5ysrCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6-01l-vtNZZU;"},
     ]
+
+    index = 0
 
     def process_request(self, request, spider):
         print('PROCESSING REQUEST!')
 
-        for i in range(94):
-            for c in self.cookies:
-                request.cookies = c
+        if (self.index == int(len(self.cookies))):
+            self.index = 0
+        else:
+            self.index += 1
+
+        print(self.index)
+        print(self.cookies[self.index])
+        request.cookies = self.cookies[self.index]
         return
 
-# class ScrapyProjectSpiderMiddleware(object):
+    # class ScrapyProjectSpiderMiddleware(object):
 #     # Not all methods need to be defined. If a method is not defined,
 #     # scrapy acts as if the spider middleware does not modify the
 #     # passed objects.

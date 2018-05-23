@@ -11,8 +11,7 @@
 #         return item
 
 from scrapy.exporters import JsonLinesItemExporter
-from .spiders.stocks import ShSpider
-from .spiders.stocks import SzSpider
+from .spiders.stocks import StockSpider
 import os
 import arrow
 
@@ -21,7 +20,6 @@ class StockPipeline(object):
     def __init__(self):
         self.fp = {}
         self.exporter = {}
-        self.symbol_prefix = ''
         self.output_path = ''
         self.full_time = arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
 
@@ -33,13 +31,7 @@ class StockPipeline(object):
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
 
-        # Judge SZ/SH
-        if spider.__class__ == SzSpider:
-            self.symbol_prefix = 'SZ'
-            file_name = 'sz_stock_%s.json' % self.full_time
-        elif spider.__class__ == ShSpider:
-            self.symbol_prefix = 'SH'
-            file_name = 'sh_stock_%s.json' % self.full_time
+        file_name = 'stock_%s.json' % self.full_time
 
         self.fp = open(os.path.join(self.output_path, file_name), 'wb')
         self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
@@ -49,7 +41,6 @@ class StockPipeline(object):
 
         item['name'] = item['name'].replace('Ａ', 'A').replace('Ｂ', 'B').replace(' ', '')
         item['name'] = item['name'].replace('XD', '').replace('XR', '').replace('DR', '')
-        item['symbol'] = self.symbol_prefix + item['code']
         item['extra'] = []
 
         # Extra stock name
@@ -62,6 +53,7 @@ class StockPipeline(object):
         if '*' in item['name']:
             extra_name = item['name'].replace('*', '')
             item['extra'].append(extra_name)
+
 
         self.exporter.export_item(item)
 
@@ -84,8 +76,9 @@ class IndexPipeline(object):
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
 
+        file_name = 'index_%s.json' % self.full_time
         # Save
-        self.fp = open(os.path.join(self.output_path, 'index.json'), 'wb')
+        self.fp = open(os.path.join(self.output_path, file_name), 'wb')
         self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
         print('Crawl Start...' + str(spider.__class__))
 
