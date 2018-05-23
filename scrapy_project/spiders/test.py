@@ -14,5 +14,18 @@ def join_live_url(words):
     return url
 
 
+print(join_live_url(['a', 'b', 'c', 'd', 'e']))
 
-print(join_live_url(['a','b','c','d','e']))
+demo_words = list(range(10))
+for i in range(26):
+    demo_words.append(chr(i + ord('a')))
+
+five_words = []
+for i in range(len(demo_words)):
+    five = demo_words[i * 5:i * 5 + 5]
+    if not five: break
+
+    five_words.append(five)
+
+print(five_words)
+

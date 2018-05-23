@@ -8,24 +8,43 @@ class BaiduIndexSpider(scrapy.Spider):
     name = 'baidu_index'
     allowed_domains = ['baidu.com']
     start_urls = ['']
-    cookies = {
-        'BDUSS': '5veUhpWlkxU3NtYVJodGtya1pYd1pzWDB0fmsyUU8tZ3U3bUpkcXAzUE5WU3BiQVFBQUFBJCQAAAAAAAAAAAEAAADQkClfS2ltd2hvZXZlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM3IAlvNyAJbMn'}
+
+    custom_settings = {
+        "DOWNLOADER_MIDDLEWARES": {
+            'scrapy_project.middlewares.BaiduDownloaderMiddleware': 543,
+        },
+        "ITEM_PIPELINES": {
+            'scrapy_project.pipelines.IndexPipeline': 300,
+        }
+    }
+
+    # cookies = {
+    #     'BDUSS': '5veUhpWlkxU3NtYVJodGtya1pYd1pzWDB0fmsyUU8tZ3U3bUpkcXAzUE5WU3BiQVFBQUFBJCQAAAAAAAAAAAEAAADQkClfS2ltd2hvZXZlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM3IAlvNyAJbMn'}
 
     def start_requests(self):
-        words = ['a', 'b', 'c', 'd', 'e']
-        url = self.join_url(words)
+        # Create 0-9 a-z
+        demo_words = list(range(10))
+        for i in range(26):
+            demo_words.append(chr(i + ord('a')))
 
-        request = scrapy.http.Request(url=url,
-                                      cookies=self.cookies,
-                                      callback=self.get_password)
-        yield request
+        five_words = []
+        for i in range(len(demo_words)):
+            five = demo_words[i * 5:i * 5 + 5]
+            if not five: break
+
+            five_words.append(five)
+
+        for f in five_words:
+            url = self.join_url(f)
+            request = scrapy.http.Request(url=url, callback=self.get_password)
+            yield request
 
     def get_password(self, response):
+        print(response.text)
         data_json = json.loads(response.text)
         uniqid = data_json['uniqid']
 
         request = scrapy.http.Request(url='http://index.baidu.com/Interface/api/ptbk?uniqid=' + uniqid,
-                                      cookies=self.cookies,
                                       meta={'data': data_json['data']},
                                       callback=self.parse_json)
         yield request
