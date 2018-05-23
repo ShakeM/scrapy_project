@@ -8,4 +8,5 @@ import os
 
 # os.system('scrapy crawl sh_spider')
 # os.system('scrapy crawl sz_spider')
+# os.system('scrapy crawl sz_spider')
 os.system('scrapy crawl baidu_index')
