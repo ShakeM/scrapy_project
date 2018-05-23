@@ -93,7 +93,7 @@ class BaiduIndexSpider(scrapy.Spider):
         parent_folder = os.path.dirname(this_folder)
         output_path = os.path.join(parent_folder, 'output')
 
-        file_name = 'stock_2018-05-23_17-50-21_1527069021.json'
+        file_name = 'stock_2018-05-23_23-53-53_1527090833.json'
         file_path = os.path.join(output_path, file_name)
         print(os.path.exists(file_name))
 

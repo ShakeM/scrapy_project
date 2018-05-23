@@ -60,5 +60,5 @@ def verify_bduss(cookies):
     else:
         return False
 
-for c in cookies:
-    print(verify_bduss(c))
+# for c in cookies:
+#     print(verify_bduss(c))
