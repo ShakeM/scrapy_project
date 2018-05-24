@@ -2,9 +2,9 @@
 import scrapy
 from ..items import IndexItem
 
-import os
-import json
+import os, json, re
 from scrapy_project.util import verification
+from functools import reduce
 
 
 class BaiduIndexSpider(scrapy.Spider):
@@ -92,7 +92,7 @@ class BaiduIndexSpider(scrapy.Spider):
         parent_folder = os.path.dirname(this_folder)
         output_path = os.path.join(parent_folder, 'output')
 
-        file_name = 'stock_2018-05-23_23-53-53_1527090833.json'
+        file_name = self.get_newest_stock_file()
         file_path = os.path.join(output_path, file_name)
         print(os.path.exists(file_name))
 
@@ -125,7 +125,7 @@ class BaiduIndexSpider(scrapy.Spider):
             five_words.append(five)
 
         for f in five_words:
-            url = self.join_url(f)
+            url = self.__join_url(f)
             cookie = self.get_cookie()
             request = scrapy.http.Request(url=url, callback=self.get_password, meta={'cookie': cookie})
             request.cookies = cookie
@@ -148,9 +148,9 @@ class BaiduIndexSpider(scrapy.Spider):
         data = response.meta['data']
         for obj in data:
             index = obj['index'][0]
-            index['_pc'] = self.decipher(index['_pc'], password)
-            index['_all'] = self.decipher(index['_all'], password)
-            index['_wise'] = self.decipher(index['_wise'], password)
+            index['_pc'] = self.__decipher(index['_pc'], password)
+            index['_all'] = self.__decipher(index['_all'], password)
+            index['_wise'] = self.__decipher(index['_wise'], password)
             item = IndexItem(word=obj['key'],
                              period=obj['index'][0]['period'],
                              pc=index['_pc'],
@@ -160,9 +160,9 @@ class BaiduIndexSpider(scrapy.Spider):
             # print(item)
             yield item
 
-    def decipher(self, ciphertext, password):
+    def __decipher(self, ciphertext, password):
         """
-        >>> BaiduIndexSpider().decipher('8N8NIN0NsN0N0NoNoNINyNoNoNhN-NIN-NINONhNhN8N-Ns','k8.y-Oh0N2IZsog.5-07861,+4%329')
+        >>> BaiduIndexSpider().__decipher('8N8NIN0NsN0N0NoNoNINyNoNoNhN-NIN-NINONhNhN8N-Ns','k8.y-Oh0N2IZsog.5-07861,+4%329')
         '5,5,4,1,3,1,1,2,2,4,0,2,2,6,7,4,7,4,8,6,6,5,7,3'
         """
         length = int(len(password) / 2)
@@ -179,7 +179,7 @@ class BaiduIndexSpider(scrapy.Spider):
         result_str = "".join(result)
         return result_str
 
-    def join_url(self, words):
+    def __join_url(self, words):
         # 全国 北京 上海 广州 深圳
         url = 'http://index.baidu.com/Interface/Newwordgraph/getLive?'
 
@@ -201,8 +201,24 @@ class BaiduIndexSpider(scrapy.Spider):
         print(self.cookies[self.index])
         return self.cookies[self.index]
 
+    @classmethod
+    def get_newest_stock_file(self):
+        this_folder = os.path.dirname(__file__)
+        parent_folder = os.path.dirname(this_folder)
+        output_path = os.path.join(parent_folder, 'output')
+        files = os.listdir(output_path)
+
+        stock_files = list(filter(lambda x: 'stock' in x, files))
+
+        newest_stock_file = reduce(lambda a, b: a if int((re.findall('(?<=__).*(?=.json)', a) or ['0'])[0]) >
+                                                     int((re.findall('(?<=__).*(?=.json)', b) or ['0'])[0]) else b,
+                                   stock_files)
+        return newest_stock_file
+
 
 if __name__ == '__main__':
-    import doctest
-
-    doctest.testmod()
+    aa = BaiduIndexSpider.get_newest_stock_file()
+    print(aa)
+    # import doctest
+    #
+    # doctest.testmod()

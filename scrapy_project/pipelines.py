@@ -14,6 +14,7 @@ from scrapy.exporters import JsonLinesItemExporter
 from .spiders.stocks import StockSpider
 import os
 import arrow
+import yagmail
 
 
 class StockPipeline(object):
@@ -21,7 +22,7 @@ class StockPipeline(object):
         self.fp = {}
         self.exporter = {}
         self.output_path = ''
-        self.file_name = 'stock_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
+        self.file_name = 'stock_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
 
     def open_spider(self, spider):
         # Make output folder
@@ -55,6 +56,9 @@ class StockPipeline(object):
         self.exporter.export_item(item)
 
     def close_spider(self, spider):
+        yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
+        file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
+        yag.send('jonathan@xunlei.net', self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))
 
 
@@ -63,7 +67,7 @@ class IndexPipeline(object):
         self.fp = {}
         self.exporter = {}
         self.output_path = ''
-        self.full_time = arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
+        self.file_name = 'index_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
 
     def open_spider(self, spider):
         # Make output folder
@@ -73,9 +77,8 @@ class IndexPipeline(object):
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
 
-        file_name = 'index_%s.json' % self.full_time
         # Save
-        self.fp = open(os.path.join(self.output_path, file_name), 'wb')
+        self.fp = open(os.path.join(self.output_path, self.file_name), 'wb')
         self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
         print('Crawl Start...' + str(spider.__class__))
 
@@ -83,5 +86,8 @@ class IndexPipeline(object):
         print(item)
         self.exporter.export_item(item)
 
-    def close_spider(self,spider):
-        pass
+    def close_spider(self, spider):
+        yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
+        file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
+        yag.send('jonathan@xunlei.net', self.file_name, file_path)
+        print('Crawl Stop...' + str(spider.__class__))

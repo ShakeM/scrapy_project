@@ -1,4 +1,8 @@
 from scrapy_project.util import verification
+import yagmail
+import os
+import re
+from functools import reduce
 
 cookies = [
     {
@@ -54,5 +58,24 @@ cookies = [
 ]
 
 if __name__ == '__main__':
-    for c in cookies:
-        print(verification.verify_bduss(c))
+    # for c in cookies:
+    #     print(verification.verify_bduss(c))
+
+    # yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
+    # folder_path = os.path.dirname(__file__)
+    # file_path  = os.path.join(folder_path,'test.py').replace('\\','/').replace('/','//')
+    # yag.send('jonathan@xunlei.net', 'stock_2018-05-23_23-53-53_1527090833.json', self.output_path)
+
+    this_folder = os.path.dirname(__file__)
+    parent_folder = os.path.dirname(this_folder)
+    output_path = os.path.join(parent_folder, 'output')
+    files = os.listdir(output_path)
+
+    stock_files = list(filter(lambda x: 'stock' in x, files))
+
+    newest_stock_file = reduce(lambda a, b: a if int((re.findall('(?<=__).*(?=.json)', a) or ['0'])[0]) >
+                                            int((re.findall('(?<=__).*(?=.json)', b) or ['0'])[0]) else b, stock_files)
+    print(newest_stock_file)
+
+    # print(reduce(lambda x, y: x if x > y else y, aa))
+    # print(os.listdir('..output'))
