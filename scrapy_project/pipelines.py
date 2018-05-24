@@ -21,7 +21,7 @@ class StockPipeline(object):
         self.fp = {}
         self.exporter = {}
         self.output_path = ''
-        self.full_time = arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
+        self.file_name = 'stock_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss_X')
 
     def open_spider(self, spider):
         # Make output folder
@@ -31,9 +31,7 @@ class StockPipeline(object):
         if not os.path.exists(self.output_path):
             os.mkdir(self.output_path)
 
-        file_name = 'stock_%s.json' % self.full_time
-
-        self.fp = open(os.path.join(self.output_path, file_name), 'wb')
+        self.fp = open(os.path.join(self.output_path, self.file_name), 'wb')
         self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
         print('Crawl Start...' + str(spider.__class__))
 
@@ -53,7 +51,6 @@ class StockPipeline(object):
         if '*' in item['name']:
             extra_name = item['name'].replace('*', '')
             item['extra'].append(extra_name)
-
 
         self.exporter.export_item(item)
 
@@ -85,3 +82,6 @@ class IndexPipeline(object):
     def process_item(self, item, spider):
         print(item)
         self.exporter.export_item(item)
+
+    def close_spider(self,spider):
+        pass

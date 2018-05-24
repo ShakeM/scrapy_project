@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import json
 from ..items import IndexItem
 
 import os
 import json
-from . import util
+from scrapy_project.util import verification
 
 
 class BaiduIndexSpider(scrapy.Spider):
@@ -82,7 +81,7 @@ class BaiduIndexSpider(scrapy.Spider):
     def start_requests(self):
         # Verify cookies
         for c in self.cookies:
-            result = util.verify_bduss(c)
+            result = verification.verify_bduss(c)
             if result == False:
                 print('Cookies fail')
                 print(c)

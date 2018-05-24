@@ -1,4 +1,5 @@
-import requests
+from scrapy_project.util import verification
+
 cookies = [
     {
         "BDUSS": "1hMlV6ZVl4WnBqd0x5bmF-TWVac1RmRjU3NGFrb1BINVF3RkV0UUlNTi1TfnRaTVFBQUFBJCQAAAAAAAAAAAEAAAA8cC7Gua3B6cvJtcS5ysrCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6-01l-vtNZZU;"},
@@ -52,13 +53,6 @@ cookies = [
         "BDUSS": "2l2RTNnbTNUQjM2MlJwN3lCRlNmSkNzamVRV1BNdkJhamhkek8wcEdhRDJseGxhTVFBQUFBJCQAAAAAAAAAAAEAAACC23TJyf7Q49bxZ3JlYXQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPYK8ln2CvJZc;"}
 ]
 
-def verify_bduss(cookies):
-    url = 'https://zhidao.baidu.com/ichat/api/chatlist'
-    response = requests.get(url, cookies=cookies)
-    if "u6210" in response.text:
-        return True
-    else:
-        return False
-
-for c in cookies:
-    print(verify_bduss(c))
+if __name__ == '__main__':
+    for c in cookies:
+        print(verification.verify_bduss(c))
