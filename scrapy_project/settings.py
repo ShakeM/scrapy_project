@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+
 # Scrapy settings for scrapy_project project
 #
 # For simplicity, this file contains only settings considered important or
