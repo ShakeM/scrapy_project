@@ -58,7 +58,7 @@ class StockPipeline(object):
     def close_spider(self, spider):
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('jonathan@xunlei.net', self.file_name, file_path)
+        yag.send('18616020643@163.com', self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))
 
 
@@ -89,5 +89,5 @@ class IndexPipeline(object):
     def close_spider(self, spider):
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('jonathan@xunlei.net', self.file_name, file_path)
+        yag.send('18616020643@163.com', self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))
