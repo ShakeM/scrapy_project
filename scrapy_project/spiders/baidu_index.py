@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from ..items import IndexItem
+import yagmail
 
 import os, json, re
 from scrapy_project.util import verification
@@ -17,8 +18,6 @@ class BaiduIndexSpider(scrapy.Spider):
             "BDUSS": "1hMlV6ZVl4WnBqd0x5bmF-TWVac1RmRjU3NGFrb1BINVF3RkV0UUlNTi1TfnRaTVFBQUFBJCQAAAAAAAAAAAEAAAA8cC7Gua3B6cvJtcS5ysrCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6-01l-vtNZZU;"},
         {
             "BDUSS": "0hUWU5oSlVub2RKNjBpSHNESGZoZk9rQVhJLS1SU1JkTFJnbGRVY29sYW1TfnRaSVFBQUFBJCQAAAAAAAAAAAEAAACARy7G1bKzve-~AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKa-01mmvtNZZ;"},
-        {
-            "BDUSS": "mYzSkF-d0tJVzJkbkFEZ1ZITHhmSVJnYnBXRnk4MWQwYU1QflBmNmt3eVdTfnRaSVFBQUFBJCQAAAAAAAAAAAEAAAB~Ni7G0dTApcjxaGVhdmVuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJa-01mWvtNZR;"},
         {
             "BDUSS": "ndMNTNmVmZDRWY4V2VvaWNFUzgwT1JMLTl2NGd5V2RLNUR5ZkJUZWtGdDdTfnRaTVFBQUFBJCQAAAAAAAAAAAEAAAAncC7GvOHOysT9y6vX0wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHu-01l7vtNZU;"},
         {
@@ -85,6 +84,8 @@ class BaiduIndexSpider(scrapy.Spider):
             if result == False:
                 print('Cookies fail')
                 print(c)
+                yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
+                yag.send('18616020643@163.com', 'Cookie失败')
                 return
 
         # Read output
