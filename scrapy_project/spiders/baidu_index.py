@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from ..items import IndexItem
+import yagmail
 
 import os, json, re
 from scrapy_project.util import verification
@@ -83,6 +84,8 @@ class BaiduIndexSpider(scrapy.Spider):
             if result == False:
                 print('Cookies fail')
                 print(c)
+                yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
+                yag.send('18616020643@163.com', 'Cookie失败')
                 return
 
         # Read output
