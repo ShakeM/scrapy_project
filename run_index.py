@@ -1,4 +1,4 @@
-rom scrapy_project.util import verify
+from scrapy_project.util import verify
 import yagmail
 from scrapy_project.spiders.baidu_index import BaiduIndexSpider
 from scrapy_project.spiders import baidu_index
