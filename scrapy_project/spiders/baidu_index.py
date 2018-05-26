@@ -4,7 +4,7 @@ from ..items import IndexItem
 import yagmail
 
 import os, json, re
-from scrapy_project.util import verification
+from scrapy_project.util import verify
 from functools import reduce
 
 
@@ -74,20 +74,7 @@ class BaiduIndexSpider(scrapy.Spider):
         }
     }
 
-    # cookies = {
-    #     'BDUSS': '5veUhpWlkxU3NtYVJodGtya1pYd1pzWDB0fmsyUU8tZ3U3bUpkcXAzUE5WU3BiQVFBQUFBJCQAAAAAAAAAAAEAAADQkClfS2ltd2hvZXZlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM3IAlvNyAJbMn'}
-
     def start_requests(self):
-        # Verify cookies
-        for c in self.cookies:
-            result = verification.verify_bduss(c)
-            if result == False:
-                print('Cookies fail')
-                print(c)
-                yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
-                yag.send('18616020643@163.com', 'Cookie失败')
-                return
-
         # Read output
         this_folder = os.path.dirname(__file__)
         parent_folder = os.path.dirname(this_folder)

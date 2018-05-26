@@ -23,6 +23,7 @@ class StockPipeline(object):
         self.exporter = {}
         self.output_path = ''
         self.file_name = 'stock_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
+        self.count = 0
 
     def open_spider(self, spider):
         # Make output folder
@@ -37,6 +38,7 @@ class StockPipeline(object):
         print('Crawl Start...' + str(spider.__class__))
 
     def process_item(self, item, spider):
+        self.count += 1
 
         item['name'] = item['name'].replace('Ａ', 'A').replace('Ｂ', 'B').replace(' ', '')
         item['name'] = item['name'].replace('XD', '').replace('XR', '').replace('DR', '')
@@ -58,7 +60,7 @@ class StockPipeline(object):
     def close_spider(self, spider):
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('18616020643@163.com', self.file_name, file_path)
+        yag.send('18616020643@163.com', '【' + str(self.count) + '】' + self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))
 
 
@@ -68,6 +70,7 @@ class IndexPipeline(object):
         self.exporter = {}
         self.output_path = ''
         self.file_name = 'index_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
+        self.count = 0
 
     def open_spider(self, spider):
         # Make output folder
@@ -83,11 +86,12 @@ class IndexPipeline(object):
         print('Crawl Start...' + str(spider.__class__))
 
     def process_item(self, item, spider):
+        self.count += 1
         print(item)
         self.exporter.export_item(item)
 
     def close_spider(self, spider):
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('18616020643@163.com', self.file_name, file_path)
+        yag.send('18616020643@163.com', '【' + str(self.count) + '】' + self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))

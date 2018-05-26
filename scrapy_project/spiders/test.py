@@ -1,4 +1,4 @@
-from scrapy_project.util import verification
+from scrapy_project.util import verify
 import yagmail
 import os
 import re
@@ -57,7 +57,7 @@ cookies = [
 
 if __name__ == '__main__':
     for c in cookies:
-        print(verification.verify_bduss(c))
+        print(verify.bduss(c))
 
     # yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
     # folder_path = os.path.dirname(__file__)
