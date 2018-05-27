@@ -117,7 +117,7 @@ class BaiduIndexSpider(scrapy.Spider):
             url = self.__join_url(f)
             cookie = self.get_cookie()
             backup_request = scrapy.http.Request(url=url, callback=self.get_password,
-                                                 meta={'cookie': cookie}, cookies=cookie)
+                                                 meta={'cookie': cookie}, cookies=cookie,dont_filter=True)
             request = scrapy.http.Request(url=url, callback=self.get_password,
                                           meta={'cookie': cookie, 'backup_request': backup_request}, cookies=cookie)
             # request.cookies = cookie
