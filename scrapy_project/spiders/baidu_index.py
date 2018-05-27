@@ -116,23 +116,23 @@ class BaiduIndexSpider(scrapy.Spider):
         for f in five_words:
             url = self.__join_url(f)
             cookie = self.get_cookie()
-            backup_request = scrapy.http.Request(url=url, callback=self.get_password,
-                                                 meta={'cookie': cookie}, cookies=cookie,dont_filter=True)
             request = scrapy.http.Request(url=url, callback=self.get_password,
-                                          meta={'cookie': cookie, 'backup_request': backup_request}, cookies=cookie)
+                                          meta={'cookie': cookie, 'url': url}, cookies=cookie)
             # request.cookies = cookie
             yield request
 
     def get_password(self, response):
         cookie = response.meta['cookie']
-        backup_request = response.meta['backup_request']
+        url = response.meta['url']
+        backup_request = scrapy.http.Request(url=url, callback=self.get_password,
+                                             meta={'cookie': cookie, 'url': url}, dont_filter=True)
+
         try:
             data_json = json.loads(response.text)
             uniqid = data_json['uniqid']
 
-
             request = scrapy.http.Request(url='http://index.baidu.com/Interface/api/ptbk?uniqid=' + uniqid,
-                                          meta={'data': data_json['data'], 'backup_request': backup_request},
+                                          meta={'data': data_json['data'], cookie: 'cookie', 'url': url},
                                           callback=self.parse_json)
             request.cookies = cookie
             yield request
@@ -142,7 +142,10 @@ class BaiduIndexSpider(scrapy.Spider):
             yield backup_request
 
     def parse_json(self, response):
-        backup_request = response.meta['backup_request']
+        url = response.meta['url']
+        cookie = response.meta['cookie']
+        backup_request = scrapy.http.Request(url=url, callback=self.get_password,
+                                             meta={'cookie': cookie, 'url': url}, dont_filter=True)
 
         try:
             password = json.loads(response.text)['data']
