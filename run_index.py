@@ -4,7 +4,6 @@ from scrapy_project.spiders.baidu_index import BaiduIndexSpider
 from scrapy_project.spiders import baidu_index
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-from scrapy_project.spiders.stocks import StockSpider
 
 if __name__ == '__main__':
     b = baidu_index.BaiduIndexSpider()
@@ -12,7 +11,6 @@ if __name__ == '__main__':
 
     if verify.bdusses(cookies):
         process = CrawlerProcess(get_project_settings())
-        process.crawl(StockSpider)
         process.crawl(BaiduIndexSpider)
         process.start()
     else:
