@@ -6,6 +6,7 @@ import yagmail
 import os, json, re
 from scrapy_project.util import verify
 from functools import reduce
+import random
 
 
 class BaiduIndexSpider(scrapy.Spider):
@@ -115,38 +116,54 @@ class BaiduIndexSpider(scrapy.Spider):
         for f in five_words:
             url = self.__join_url(f)
             cookie = self.get_cookie()
-            request = scrapy.http.Request(url=url, callback=self.get_password, meta={'cookie': cookie})
-            request.cookies = cookie
+            backup_request = scrapy.http.Request(url=url, callback=self.get_password,
+                                                 meta={'cookie': cookie}, cookies=cookie)
+            request = scrapy.http.Request(url=url, callback=self.get_password,
+                                          meta={'cookie': cookie, 'backup_request': backup_request}, cookies=cookie)
+            # request.cookies = cookie
             yield request
 
     def get_password(self, response):
         cookie = response.meta['cookie']
-        data_json = json.loads(response.text)
-        uniqid = data_json['uniqid']
+        backup_request = response.meta['backup_request']
+        try:
+            data_json = json.loads(response.text)
+            uniqid = data_json['uniqid']
 
-        request = scrapy.http.Request(url='http://index.baidu.com/Interface/api/ptbk?uniqid=' + uniqid,
-                                      meta={'data': data_json['data']},
-                                      callback=self.parse_json)
-        request.cookies = cookie
-        yield request
+
+            request = scrapy.http.Request(url='http://index.baidu.com/Interface/api/ptbk?uniqid=' + uniqid,
+                                          meta={'data': data_json['data'], 'backup_request': backup_request},
+                                          callback=self.parse_json)
+            request.cookies = cookie
+            yield request
+        except Exception as e:
+            c = list(random.sample(self.cookies, 1))[0]
+            backup_request.cookies = c
+            yield backup_request
 
     def parse_json(self, response):
-        password = json.loads(response.text)['data']
+        backup_request = response.meta['backup_request']
 
-        data = response.meta['data']
-        for obj in data:
-            index = obj['index'][0]
-            index['_pc'] = self.__decipher(index['_pc'], password)
-            index['_all'] = self.__decipher(index['_all'], password)
-            index['_wise'] = self.__decipher(index['_wise'], password)
-            item = IndexItem(word=obj['key'],
-                             period=obj['index'][0]['period'],
-                             pc=index['_pc'],
-                             all=index['_all'],
-                             wise=index['_wise'],
-                             )
-            # print(item)
-            yield item
+        try:
+            password = json.loads(response.text)['data']
+
+            data = response.meta['data']
+            for obj in data:
+                index = obj['index'][0]
+                index['_pc'] = self.__decipher(index['_pc'], password)
+                index['_all'] = self.__decipher(index['_all'], password)
+                index['_wise'] = self.__decipher(index['_wise'], password)
+                item = IndexItem(word=obj['key'],
+                                 period=obj['index'][0]['period'],
+                                 pc=index['_pc'],
+                                 all=index['_all'],
+                                 wise=index['_wise'],
+                                 )
+                yield item
+        except Exception as e:
+            c = list(random.sample(self.cookies, 1))[0]
+            backup_request.cookies = c
+            yield backup_request
 
     def __decipher(self, ciphertext, password):
         """
