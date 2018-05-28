@@ -132,11 +132,12 @@ class BaiduIndexSpider(scrapy.Spider):
             uniqid = data_json['uniqid']
 
             request = scrapy.http.Request(url='http://index.baidu.com/Interface/api/ptbk?uniqid=' + uniqid,
-                                          meta={'data': data_json['data'], cookie: 'cookie', 'url': url},
+                                          meta={'data': data_json['data'], 'cookie': cookie, 'url': url},
                                           callback=self.parse_json)
             request.cookies = cookie
             yield request
         except Exception as e:
+            print('Error:' + str(e))
             c = list(random.sample(self.cookies, 1))[0]
             backup_request.cookies = c
             yield backup_request
@@ -164,6 +165,7 @@ class BaiduIndexSpider(scrapy.Spider):
                                  )
                 yield item
         except Exception as e:
+            print('Error:' + str(e))
             c = list(random.sample(self.cookies, 1))[0]
             backup_request.cookies = c
             yield backup_request
