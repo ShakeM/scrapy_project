@@ -1,8 +1,8 @@
 import json, os
 
 folder_path = os.path.dirname(__file__)
-f1_path = os.path.join(folder_path, 'index_2018-05-31_22-00-53__1527775253.json')
-f2_path = os.path.join(folder_path, 'index_2018-06-01_10-00-53__1527818453.json')
+f1_path = os.path.join(folder_path, 'index_2018-06-01_13-13-09__1527829989.json')
+f2_path = os.path.join(folder_path, 'index_2018-05-31_22-00-53__1527775253.json')
 # f2_path = os.path.join(folder_path, 'standard.json')
 
 words_1 = []
