@@ -11,10 +11,10 @@
 #         return item
 
 from scrapy.exporters import JsonLinesItemExporter
-from .spiders.stocks import StockSpider
 import os
 import arrow
 import yagmail
+from scrapy_project.util.sql import Database, Stock
 
 
 class StockPipeline(object):
@@ -23,7 +23,10 @@ class StockPipeline(object):
         self.exporter = {}
         self.output_path = ''
         self.file_name = 'stock_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
+        self.new_count = 0
         self.count = 0
+
+        self.session = Database().session()
 
     def open_spider(self, spider):
         # Make output folder
@@ -39,7 +42,6 @@ class StockPipeline(object):
 
     def process_item(self, item, spider):
         self.count += 1
-
         item['name'] = item['name'].replace('Ａ', 'A').replace('Ｂ', 'B').replace(' ', '')
         item['name'] = item['name'].replace('XD', '').replace('XR', '').replace('DR', '')
         item['extra'] = []
@@ -57,11 +59,22 @@ class StockPipeline(object):
 
         self.exporter.export_item(item)
 
+        # Database
+        item['extra'] = str(item['extra'])
+        if not self.session.query(Stock).filter_by(**item).all():
+            stock = Stock(**item)
+            self.session.add(stock)
+            self.new_count += 1
+
     def close_spider(self, spider):
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('18616020643@163.com', '【' + str(self.count) + '】' + self.file_name, file_path)
+        yag.send('18616020643@163.com', '【' + str(self.new_count) + '】【' + str(self.count) +'】'+ self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))
+
+        # Database
+        self.session.commit()
+        self.session.close()
 
 
 class IndexPipeline(object):

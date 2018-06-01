@@ -35,11 +35,7 @@ class StockSpider(scrapy.Spider):
         request = scrapy.FormRequest(self.sz_url, formdata=self.formdata, callback=self.parse_sz_page)
         yield request
 
-        yield StockItem(code="000001", name="上证指数", symbol="SH000001", extra=["上证", "A股"])
-        yield StockItem(code="000300", name="沪深300", symbol="SH000300", extra=["399300"])
-        yield StockItem(code="399001", name="深证成指", symbol="SZ399001", extra=["深圳指数"])
-        yield StockItem(code="399005", name="中小板指", symbol="SZ399005", extra=["中小板指数"])
-        yield StockItem(code="399006", name="创业板指", symbol="SZ399006", extra=["创业板指数"])
+
 
 
     def parse(self, response):
