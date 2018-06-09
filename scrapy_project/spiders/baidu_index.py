@@ -7,6 +7,7 @@ import os, json, re
 from scrapy_project.util import verify
 from functools import reduce
 import random
+from scrapy_project.util.sql import Stock, Database
 
 
 class BaiduIndexSpider(scrapy.Spider):
@@ -65,6 +66,8 @@ class BaiduIndexSpider(scrapy.Spider):
             "BDUSS": "2l2RTNnbTNUQjM2MlJwN3lCRlNmSkNzamVRV1BNdkJhamhkek8wcEdhRDJseGxhTVFBQUFBJCQAAAAAAAAAAAEAAACC23TJyf7Q49bxZ3JlYXQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPYK8ln2CvJZc;"}
     ]
 
+    stocks = []
+
     index = 0
     custom_settings = {
         # "DOWNLOADER_MIDDLEWARES": {
@@ -75,25 +78,29 @@ class BaiduIndexSpider(scrapy.Spider):
         }
     }
 
+    def __init__(self):
+        session = Database().session()
+        self.stocks = session.query(Stock).all()
+
     def start_requests(self):
-        # Read output
-        this_folder = os.path.dirname(__file__)
-        parent_folder = os.path.dirname(this_folder)
-        output_path = os.path.join(parent_folder, 'output')
-
-        file_name = self.get_newest_stock_file()
-        file_path = os.path.join(output_path, file_name)
-        print(os.path.exists(file_name))
-
-        fp = open(file_path, 'r', encoding='utf-8')
-        lines = fp.readlines()
+        ## Read output
+        # this_folder = os.path.dirname(__file__)
+        # parent_folder = os.path.dirname(this_folder)
+        # output_path = os.path.join(parent_folder, 'output')
+        #
+        # file_name = self.get_newest_stock_file()
+        # file_path = os.path.join(output_path, file_name)
+        # print(os.path.exists(file_name))
+        #
+        # fp = open(file_path, 'r', encoding='utf-8')
+        # lines = fp.readlines()
 
         words = []
-        for l in lines:
-            obj = json.loads(l)
-            words.append(obj['code'])
-            words.append(obj['name'])
-            words += obj['extra']
+        stocks = self.stocks
+        for s in stocks:
+            words += eval(s.extra)
+            words.append(s.code)
+            words.append(s.name)
 
         # Group 5
         five_words = []
