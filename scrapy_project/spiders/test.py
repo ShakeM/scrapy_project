@@ -6,8 +6,8 @@ from functools import reduce
 import requests
 import random
 
-arr = [1,2,3]
-print(list(random.sample(arr,1))[0])
+arr = [1, 2, 3]
+print(list(random.sample(arr, 1))[0])
 
 #
 #
@@ -68,13 +68,6 @@ if __name__ == '__main__':
         # print(verify.bduss(c))
         print(requests.get('http://index.baidu.com/Interface/Newwordgraph/getLive?wordlist[]=q',
                            cookies=c).content)
-
-
-
-
-
-
-
 
 # yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
 # folder_path = os.path.dirname(__file__)

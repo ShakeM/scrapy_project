@@ -15,7 +15,7 @@ import os
 import arrow
 import yagmail
 from scrapy_project.util.sql import Database, Stock, Index
-import re
+
 
 
 class StockPipeline(object):
@@ -64,15 +64,17 @@ class StockPipeline(object):
         item['extra'] = str(item['extra'])
         # if not self.session.query(Stock).filter_by(**item).all()
 
-        # Is the same name
         results = self.session.query(Stock).filter(Stock.symbol == item['symbol']).all()
         if len(results) == 0:
             stock = Stock(**item)
             self.session.add(stock)
             self.new_count += 1
+        elif (item['name'], item['symbol']) in [(result.name, result.symbol) for result in results]:
+            # Existed
+            pass
         else:
             for result in results:
-                if result.name != item['name'] and result.name not in item['name']:
+                if result.name != item['name'] and item['name'] not in result.name:
                     stock = Stock(**item)
                     self.session.add(stock)
                     self.new_count += 1
