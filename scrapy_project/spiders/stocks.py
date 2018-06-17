@@ -27,7 +27,7 @@ class StockSpider(scrapy.Spider):
         for i in range(70):
             begin = str(i * 25)
             end = str(i * 25 + 25)
-            suffix = 'begin='+begin + '&end=' + end
+            suffix = 'begin=' + begin + '&end=' + end
             url_page = url + suffix
             request = scrapy.http.Request(url=url_page)
             yield request
@@ -35,10 +35,20 @@ class StockSpider(scrapy.Spider):
         request = scrapy.FormRequest(self.sz_url, formdata=self.formdata, callback=self.parse_sz_page)
         yield request
 
-
-
+    done = False
 
     def parse(self, response):
+
+        if self.done == False:
+            # 0-9 Item
+            for i in range(10):
+                yield StockItem(code=str(i), name=str(i), symbol=str(i))
+            # a-z
+            for i in range(97, 123):
+                char = chr(i)
+                yield StockItem(code=char, name=char, symbol=char)
+            self.done = True
+
         # Shanghai stock
         response_dict = json.loads(response.text)
         stocks = response_dict['list']
@@ -47,8 +57,6 @@ class StockSpider(scrapy.Spider):
             code = s[0]
             name = s[1]
             yield StockItem(code=code, name=name, symbol='SH' + code)
-
-
 
     def parse_sz_page(self, response):
 

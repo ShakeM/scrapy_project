@@ -14,8 +14,7 @@ from scrapy.exporters import JsonLinesItemExporter
 import os
 import arrow
 import yagmail
-from scrapy_project.util.sql import Database, Stock, Index
-
+from scrapy_project.util.sql import Database, Stock, update_tables
 
 
 class StockPipeline(object):
@@ -27,7 +26,8 @@ class StockPipeline(object):
         self.new_count = 0
         self.count = 0
 
-        self.session = Database().session()
+        self.db = Database('mysql+pymysql://root:56304931a@192.168.31.138:3306/stock?charset=utf8')
+        self.session = self.db.session()
 
     def open_spider(self, spider):
         # Make output folder
@@ -81,15 +81,16 @@ class StockPipeline(object):
                     break
 
     def close_spider(self, spider):
-        yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
-        file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('18616020643@163.com', '【' + str(self.new_count) + '】【' + str(self.count) + '】' + self.file_name,
-                 file_path)
-        print('Crawl Stop...' + str(spider.__class__))
-
         # Database
         self.session.commit()
         self.session.close()
+
+        update_tables(self.db)
+
+        yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
+        file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
+        yag.send('18616020643@163.com', '【' + str(self.new_count) + '】' + self.file_name, file_path)
+        print('Crawl Stop...' + str(spider.__class__))
 
 
 class IndexPipeline(object):
@@ -123,9 +124,9 @@ class IndexPipeline(object):
         self.exporter.export_item(item)
 
         # Database
-        index = Index(word=item['word'], pc=item['pc'], wise=item['wise'], begin='2018')
+        # index = Index(word=item['word'], pc=item['pc'], wise=item['wise'], begin='2018')
 
-        self.session.add(index)
+        # self.session.add(index)
 
         # if not self.session.query(Stock).filter_by(item).all():
         #     stock = Stock(**item)
@@ -133,10 +134,11 @@ class IndexPipeline(object):
         #     self.new_count += 1
 
     def close_spider(self, spider):
+        # Database
+        self.session.commit()
+        self.session.close()
+
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
         yag.send('18616020643@163.com', '【' + str(self.count) + '】' + self.file_name, file_path)
         print('Crawl Stop...' + str(spider.__class__))
-
-        # Database
-        self.session.commit()
