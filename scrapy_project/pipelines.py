@@ -76,7 +76,7 @@ class StockPipeline(object):
         self.session.commit()
         self.session.close()
 
-        # update_tables(self.db)
+        update_tables(self.db)
 
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
         yag.send('18616020643@163.com', '新增数量【' + str(self.insert_count) + '】')
