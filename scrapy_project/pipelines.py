@@ -10,7 +10,6 @@
 #     def process_item(self, item, spider):
 #         return item
 
-import os
 import yagmail
 from scrapy_project.util.sql import Database, Stock, update_tables
 
