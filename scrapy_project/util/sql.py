@@ -1,9 +1,8 @@
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, create_engine, Integer, MetaData
-from sqlalchemy.dialects.mysql import LONGTEXT
-import arrow
+
+from config import DATABASE_URL
 
 
 class Database:
@@ -31,7 +30,7 @@ class Database:
         return keys
 
 
-db = Database('mysql+pymysql://root:56304931a@192.168.31.138:3306/stock?charset=utf8')
+db = Database(DATABASE_URL)
 
 
 class Stock(db.Base):
@@ -44,8 +43,6 @@ class Stock(db.Base):
 
 
 from sqlalchemy.exc import InvalidRequestError
-
-
 def update_tables(db):
     session = db.session()
     names = [name[0] for name in session.query(Stock.name).all()]
@@ -72,7 +69,6 @@ def update_tables(db):
             pass
 
     db.create_all()
-
 
 # update_tables(db)
 # db.drop_all()

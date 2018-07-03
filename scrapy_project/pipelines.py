@@ -10,39 +10,28 @@
 #     def process_item(self, item, spider):
 #         return item
 
-from scrapy.exporters import JsonLinesItemExporter
 import os
-import arrow
 import yagmail
 from scrapy_project.util.sql import Database, Stock, update_tables
+
+from config import DATABASE_URL
 
 
 class StockPipeline(object):
     def __init__(self):
         self.fp = {}
-        self.exporter = {}
-        self.output_path = ''
-        self.file_name = 'stock_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
-        self.new_count = 0
-        self.count = 0
+        self.update_count = 0
+        self.insert_count = 0
 
-        self.db = Database('mysql+pymysql://root:56304931a@192.168.31.138:3306/stock?charset=utf8')
+        self.db = Database(DATABASE_URL)
         self.session = self.db.session()
 
     def open_spider(self, spider):
-        # Make output folder
-        this_folder_path = os.path.dirname(__file__)
-        self.output_path = os.path.join(this_folder_path, 'output')
-
-        if not os.path.exists(self.output_path):
-            os.mkdir(self.output_path)
-
-        self.fp = open(os.path.join(self.output_path, self.file_name), 'wb')
-        self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
-        print('Crawl Start...' + str(spider.__class__))
+        pass
 
     def process_item(self, item, spider):
-        self.count += 1
+
+        #
         item['name'] = item['name'].replace('Ａ', 'A').replace('Ｂ', 'B').replace(' ', '')
         item['name'] = item['name'].replace('XD', '').replace('XR', '').replace('DR', '')
         item['extra'] = []
@@ -57,88 +46,38 @@ class StockPipeline(object):
         if '*' in item['name']:
             extra_name = item['name'].replace('*', '')
             item['extra'].append(extra_name)
-
-        self.exporter.export_item(item)
+        if 'N' in item['name']:
+            extra_name = item['name'].replace('N', '')
+            item['extra'].append(extra_name)
 
         # Database
         item['extra'] = str(item['extra'])
-        # if not self.session.query(Stock).filter_by(**item).all()
 
-        results = self.session.query(Stock).filter(Stock.symbol == item['symbol']).all()
-        if len(results) == 0:
+        result = self.session.query(Stock).filter(Stock.symbol == item['symbol']).first()
+        if result:
+            if result.name == item['name']:
+                pass
+            elif item['name'] in result.name:
+                # 上交所纠错
+                pass
+            else:
+                self.update_count += 1
+
+                extra = eval(result.extra)
+                result.extra = extra.append(item['name'])
+        else:
+            self.insert_count += 1
+
             stock = Stock(**item)
             self.session.add(stock)
-            self.new_count += 1
-        elif (item['name'], item['symbol']) in [(result.name, result.symbol) for result in results]:
-            # Existed
-            pass
-        else:
-            for result in results:
-                if result.name != item['name'] and item['name'] not in result.name:
-                    stock = Stock(**item)
-                    self.session.add(stock)
-                    self.new_count += 1
-                    break
 
     def close_spider(self, spider):
         # Database
         self.session.commit()
         self.session.close()
 
-        update_tables(self.db)
+        # update_tables(self.db)
 
         yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
-        file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('18616020643@163.com', '【' + str(self.new_count) + '】' + self.file_name, file_path)
-        print('Crawl Stop...' + str(spider.__class__))
-
-
-class IndexPipeline(object):
-    def __init__(self):
-        self.fp = {}
-        self.exporter = {}
-        self.output_path = ''
-        self.file_name = 'index_%s.json' % arrow.now().format('YYYY-MM-DD_HH-mm-ss__X')
-        self.count = 0
-        self.new_count = 0
-
-        self.session = Database().session()
-
-    def open_spider(self, spider):
-        # Make output folder
-
-        this_folder_path = os.path.dirname(__file__)
-        self.output_path = os.path.join(this_folder_path, 'output')
-
-        if not os.path.exists(self.output_path):
-            os.mkdir(self.output_path)
-
-        # Save
-        self.fp = open(os.path.join(self.output_path, self.file_name), 'wb')
-        self.exporter = JsonLinesItemExporter(self.fp, ensure_ascii=False, encoding='utf-8')
-        print('Crawl Start...' + str(spider.__class__))
-
-    def process_item(self, item, spider):
-        self.count += 1
-        print(item)
-        self.exporter.export_item(item)
-
-        # Database
-        # index = Index(word=item['word'], pc=item['pc'], wise=item['wise'], begin='2018')
-
-        # self.session.add(index)
-
-        # if not self.session.query(Stock).filter_by(item).all():
-        #     stock = Stock(**item)
-        #     self.session.add(stock)
-        #     self.new_count += 1
-
-    def close_spider(self, spider):
-        # Database
-        self.session.commit()
-        self.session.close()
-
-        yag = yagmail.SMTP('54jsy@163.com', '56304931a', 'smtp.163.com')
-        file_path = os.path.join(self.output_path, self.file_name).replace('\\', '/').replace('/', '//')
-        yag.send('18616020643@163.com', '【' + str(self.count) + '】' + self.file_name, file_path)
+        yag.send('18616020643@163.com', '新增数量【' + str(self.insert_count) + '】')
         print('Crawl Stop...' + str(spider.__class__))
