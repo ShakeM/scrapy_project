@@ -50,7 +50,6 @@ class StockPipeline(object):
             item['extra'].append(extra_name)
 
         # Database
-        item['extra'] = str(item['extra'])
 
         result = self.session.query(Stock).filter(Stock.symbol == item['symbol']).first()
         if result:
@@ -63,10 +62,13 @@ class StockPipeline(object):
                 self.update_count += 1
 
                 extra = eval(result.extra)
-                result.extra = extra.append(item['name'])
+                print(extra)
+                print(item['name'])
+                result.extra = str(extra.append(item['name']))
         else:
             self.insert_count += 1
 
+            item['extra'] = str(item['extra'])
             stock = Stock(**item)
             self.session.add(stock)
 

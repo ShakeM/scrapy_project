@@ -35,8 +35,8 @@ class StockSpider(scrapy.Spider):
         request = scrapy.FormRequest(self.sz_url, formdata=self.formdata, callback=self.parse_sz_page)
         yield request
 
-    done = False
 
+    done = False
     def parse(self, response):
 
         if self.done == False:

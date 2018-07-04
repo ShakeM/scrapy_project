@@ -43,15 +43,18 @@ class Stock(db.Base):
 
 
 from sqlalchemy.exc import InvalidRequestError
+
+
 def update_tables(db):
     session = db.session()
     names = [name[0] for name in session.query(Stock.name).all()]
     codes = [code[0] for code in session.query(Stock.code).all()]
-    extra = []
+    extras = []
     for e in session.query(Stock.extra).all():
-        extra += eval(e[0])
+        print(e[0])
+        extras += eval(e[0])
 
-    all_tables = names + extra + codes
+    all_tables = names + extras+ codes
 
     for table in all_tables:
         name = str(table)
